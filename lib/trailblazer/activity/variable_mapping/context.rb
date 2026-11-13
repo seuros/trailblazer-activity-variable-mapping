@@ -14,14 +14,26 @@ module Trailblazer
           mutable[key] || shadowed[key] # FIXME.
         end
 
-        def merge(variables)
+        def fetch(key)
+          self[key] # FIXME: behavior incorrect.
+        end
+
+        def merge(variables) # FIXME: test, especially with nested setup
           # raise
           # puts variables.inspect
-          Context.new(shadowed, mutable.merge(variables))
+          Context.new(shadowed, mutable.merge(variables), original_ctx)
+        end
+
+        def keys
+          to_h.keys # FIXME: test.
         end
 
         def decompose
           return shadowed, mutable
+        end
+
+        def key?(key)
+          to_h.key?(key) # FIXME: test, it's official API.
         end
 
         def to_h

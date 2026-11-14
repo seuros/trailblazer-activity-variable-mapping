@@ -81,7 +81,7 @@ module Trailblazer
                   ]
                 )
                 # FIXME: we don't have a coherent way of nesting Nodes, yet.
-                interface = ->(node, lib_ctx, flow_options, signal, **circuit_options) { node.(lib_ctx, flow_options, signal, **circuit_options) }
+                interface = ->(node, lib_ctx, flow_options, signal, circuit_options) { node.(lib_ctx, flow_options, signal, circuit_options) }
 
                 Trailblazer::Circuit::Node::Scoped[
                   node,

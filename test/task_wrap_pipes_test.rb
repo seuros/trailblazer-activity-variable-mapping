@@ -53,7 +53,7 @@ class TaskWrapPipesTest < Minitest::Spec
       add_default_ctx: true
     )
 
-    lib_ctx, flow_options = assert_run input_node, node: true,
+    lib_ctx, flow_options = assert_run node: input_node,
       target_ctx: original_ctx = {slug: "0x666", params: {id: 1}, seq: []}.freeze,
       signal: Object,
       terminus: Object, seq: [] # the input pipe passes through the outer signal.
@@ -76,7 +76,7 @@ class TaskWrapPipesTest < Minitest::Spec
       add_default_ctx: false # only let in defined variables.
     )
 
-    lib_ctx, flow_options = assert_run input_node, node: true, seq: nil,
+    lib_ctx, flow_options = assert_run node: input_node, seq: nil,
       target_ctx: original_ctx = {slug: "0x666", params: {id: 1}}.freeze,
       signal: Object,
       terminus: Object # the input pipe passes through the outer signal.
@@ -98,7 +98,7 @@ class TaskWrapPipesTest < Minitest::Spec
 
     output_node = Trailblazer::Activity::VariableMapping::Build::Input.(array_of_filter_rows, add_default_ctx: false)
 
-    lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+    lib_ctx, flow_options = assert_run node: output_node, seq: nil,
       # original_target_ctx: {x: 4},
       target_ctx: {from_outside: true}.freeze,
       signal: Object, terminus: Object # the input pipe passes through the outer signal.
@@ -129,7 +129,7 @@ class TaskWrapPipesTest < Minitest::Spec
 
       output_node = Trailblazer::Activity::VariableMapping::Build::Output.(array_of_filter_rows, add_default_ctx: false)
 
-      lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+      lib_ctx, flow_options = assert_run node: output_node, seq: nil,
         original_target_ctx: {x: 4},
         target_ctx: Trailblazer::Activity::VariableMapping::Context.new(
             {from_outside: true},
@@ -161,7 +161,7 @@ class TaskWrapPipesTest < Minitest::Spec
 
       output_node = Trailblazer::Activity::VariableMapping::Build::Output.(array_of_filter_rows, add_default_ctx: false)
 
-      lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+      lib_ctx, flow_options = assert_run node: output_node, seq: nil,
         original_target_ctx: {x: 4},
         target_ctx: Trailblazer::Activity::VariableMapping::Context.new(
             {from_outside: true},
@@ -192,7 +192,7 @@ class TaskWrapPipesTest < Minitest::Spec
         add_default_ctx: true
       )
 
-      lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+      lib_ctx, flow_options = assert_run node: output_node, seq: nil,
         original_target_ctx: {model: Module, controller: true},
         target_ctx: Trailblazer::Activity::VariableMapping::Context.new({from_outside: true, params: {id: 1}}, {mutable: "here", slug: "0x666"}.freeze),
         signal: Object,
@@ -215,7 +215,7 @@ class TaskWrapPipesTest < Minitest::Spec
         add_default_ctx: false # DISCUSS: this means "don't merge the inner_ctx's mutable into the outer"?
       )
 
-      lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+      lib_ctx, flow_options = assert_run node: output_node, seq: nil,
         original_target_ctx: {model: Module, params: {}},
         target_ctx: Trailblazer::Activity::VariableMapping::Context.new({from_outside: true, params: {id: 1}}, {mutable: "here", slug: "0x666"}.freeze),
         signal: Object,
@@ -238,7 +238,7 @@ class TaskWrapPipesTest < Minitest::Spec
         add_default_ctx: false # DISCUSS: this means "don't merge the inner_ctx's mutable into the outer"?
       )
 
-      lib_ctx, flow_options = assert_run output_node, node: true, seq: nil,
+      lib_ctx, flow_options = assert_run node: output_node, seq: nil,
         original_target_ctx: {x: 4},
         target_ctx: Trailblazer::Activity::VariableMapping::Context.new({from_outside: true}, {mutable: "here"}.freeze),
         signal: Object,

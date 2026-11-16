@@ -93,4 +93,40 @@ class ActivityIntegrationTest < Minitest::Spec
     # we cannot see pollute outside.
     assert_equal lib_ctx, {:target_ctx=>{:seq=>[], pollute: true, :captured=>[{:pollute=>true, :model=>nil, :params=>nil}.inspect, {:model=>nil, :params=>nil}.inspect]}}
   end
+
+  it "when inheriting, the {:exec_context} of respective nodes gets updated" do
+    my_nested_topology = Class.new(Trailblazer::Activity::Railway) do
+      step :d
+      include T.def_steps(:d)
+    end
+
+    my_topology = Class.new(Trailblazer::Activity::Railway) do
+      step T.def_steps(:a).method(:a)
+      step :b
+      step :c, Trailblazer::Activity::Railway.In() => :my_ins
+      # step Subprocess(my_nested_topology), id: :D
+      step task: my_nested_topology, id: :D, outputs: my_nested_topology.to_h[:outputs], subprocess: true, adapter: Trailblazer::Circuit::Processor
+
+      def my_ins(ctx, seq:, **)
+        {seq: seq + [:my_ins]}
+      end
+
+      include T.def_steps(:b, :c)
+    end
+
+    my_sub_topology = Class.new(my_topology) do
+      def my_ins(ctx, seq:, **)
+        {seq: seq + [:my_ins_from_sub]}
+      end
+
+      def b(ctx, seq:, **)
+        seq << :b_from_sub
+      end
+    end
+
+    lib_ctx, _ = assert_run my_topology, terminus: :success, seq: [:a, :b, :my_ins, :c, :d]
+    assert_equal lib_ctx, {target_ctx: {seq: [:a, :b, :my_ins, :c, :d]}}
+
+    lib_ctx, _ = assert_run my_sub_topology, terminus: :success, seq: [:a, :b_from_sub, :my_ins_from_sub, :c, :d]
+  end
 end

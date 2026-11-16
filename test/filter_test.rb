@@ -15,7 +15,7 @@ class FilterTest < Minitest::Spec
       write_name: :my_slug,
     )
 
-    lib_ctx, flow_options, signal = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+    lib_ctx, flow_options, signal = assert_run node: my_node, seq: nil, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
       **filter_lib_ctx_options,
       terminus: {:my_slug=>"generator-1"} # DISCUSS: value-on-signal
 
@@ -32,7 +32,7 @@ class FilterTest < Minitest::Spec
       write_name: :my_slug,
     )
 
-    lib_ctx, flow_options = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+    lib_ctx, flow_options = assert_run node: my_node, seq: nil, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
       **filter_lib_ctx_options,
       terminus: {:my_slug=>"GENERATOR-1"}
 
@@ -55,7 +55,7 @@ class FilterTest < Minitest::Spec
       write_name: :my_slug,
     )
 
-    lib_ctx, flow_options = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+    lib_ctx, flow_options = assert_run node: my_node, seq: nil,  target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
       **filter_lib_ctx_options,
       terminus: {:my_slug=>"GENERATOR-1"}
 
@@ -71,7 +71,7 @@ class FilterTest < Minitest::Spec
       args_for_step_build: [my_input_provider, {}],
     )
 
-    lib_ctx, flow_options = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+    lib_ctx, flow_options = assert_run node: my_node, seq: nil,  target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
       **filter_lib_ctx_options,
       terminus: {:my_slug=>"GENERATOR-1"}
 
@@ -98,16 +98,16 @@ class FilterTest < Minitest::Spec
       target_ctx = Trailblazer::Activity::VariableMapping::Context.new(
         ctx_from_call_task,
         {},
-        {params: {id: 1}} # this is what the Out filter sees as the "outer_ctx".
+        outer_ctx = {params: {id: 1}} # this is what the Out filter sees as the "outer_ctx".
       ).freeze
 
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         **filter_lib_ctx_options,
         target_ctx: target_ctx,
         terminus: expected_aggregate = {
           :my_slug => [
             # "#<struct Trailblazer::Activity::VariableMapping::Context shadowed={:bogus=>true, :slug=>\"0x666\"}, mutable={:outer_ctx=>{:params=>{:id=>1}}}, original_ctx=nil>", # ctx contains {:outer_ctx}, it's a new Context instance, not identical to {target_ctx}.
-            Trailblazer::Activity::VariableMapping::Context.new({:bogus=>true, :slug=>"0x666"}, {:outer_ctx=>{:params=>{:id=>1}}}).inspect,
+            Trailblazer::Activity::VariableMapping::Context.new({:bogus=>true, :slug=>"0x666"}, {:outer_ctx=>{:params=>{:id=>1}}}, outer_ctx).inspect,
             {:params=>{:id=>1}}.inspect, # this is the outer_ctx.
             {:bogus=>true, :slug=>"0x666"}.inspect # the remaining kws.
           ],
@@ -129,7 +129,7 @@ class FilterTest < Minitest::Spec
         read_name: :slug,
       )
 
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,  target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
         **filter_lib_ctx_options,
         terminus: {:slug=>"generator-1"},
         signal: Object
@@ -145,7 +145,7 @@ class FilterTest < Minitest::Spec
         read_name: :slug,
       )
 
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true, target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,  target_ctx: original_target_ctx = {slug: "generator-1"}.freeze,
         **filter_lib_ctx_options,
         terminus: {:slug=>"generator-1"} # DISCUSS: scoping?
 
@@ -193,7 +193,7 @@ class FilterTest < Minitest::Spec
       original_target_ctx = {global_id: 1}.freeze
 
       # raise "how do we get variable_present_in_application_ctx?'s Left to point to the defaulting step?"
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         target_ctx: original_target_ctx,
         **filter_lib_ctx_options,
         terminus: {my_global_id: 1}
@@ -202,7 +202,7 @@ class FilterTest < Minitest::Spec
 
       original_target_ctx = {params: {id: 2}}
       # in this run, we let the defaulting logic kick in.
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         target_ctx: original_target_ctx,
         **filter_lib_ctx_options,
         terminus: {my_global_id: 2}
@@ -225,7 +225,7 @@ class FilterTest < Minitest::Spec
       original_target_ctx = {params: {id: 1}}.freeze
 
       # only test the case where we call the {:instance_method} provider.
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         target_ctx: original_target_ctx,
         **filter_lib_ctx_options,
         terminus: {my_global_id: 1}
@@ -246,7 +246,7 @@ class FilterTest < Minitest::Spec
         original_target_ctx = {global_id: 1}.freeze
 
         # raise "how do we get variable_present_in_application_ctx?'s Left to point to the defaulting step?"
-        lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+        lib_ctx, flow_options = assert_run node: my_node, seq: nil,
           target_ctx: original_target_ctx,
           **filter_lib_ctx_options,
           terminus: {my_global_id: 1}
@@ -265,7 +265,7 @@ class FilterTest < Minitest::Spec
 
       target_ctx = {params: {id: 1}.freeze}.freeze
 
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         target_ctx: target_ctx,
         **filter_lib_ctx_options,
         terminus: {my_id: 1}
@@ -275,7 +275,7 @@ class FilterTest < Minitest::Spec
       # we still add our :my_id to aggregate, even if it's present
       target_ctx = {my_id: 2, params: {id: 1}.freeze}.freeze
 
-      lib_ctx, flow_options = assert_run my_node, seq: nil, node: true,
+      lib_ctx, flow_options = assert_run node: my_node, seq: nil,
         target_ctx: target_ctx,
         **filter_lib_ctx_options,
         terminus: {my_id: 1}
@@ -293,21 +293,23 @@ class CustomFilterTest < Minitest::Spec
 
     provider_node = Trailblazer::Circuit::Node[provider_filter, Trailblazer::Circuit::Task::Adapter::LibInterface]
 
-    steps = Trailblazer::Activity::VariableMapping::Runtime::Filter.rows_for_build(provider_node)
-    my_circuit =          Trailblazer::Circuit::Builder.Circuit(*steps)
+    my_custom_filter = Class.new(Trailblazer::Activity::VariableMapping::Runtime::Filter) do
+      def self.build_circuit(**)
+        circuit = Trailblazer::Circuit::Adds.(super, Trailblazer::Activity::VariableMapping::Runtime::Filter::Build::WRAP_VALUE_WITH_HASH) # redundant to Override.
+      end
+    end
 
-    # wrap
-    my_circuit = Trailblazer::Circuit::Adds.(my_circuit, Trailblazer::Activity::VariableMapping::Runtime::Filter::Build::WRAP_VALUE_WITH_HASH)
     my_wrap_options = {write_name: :index}
 
-      filter = Trailblazer::Activity::VariableMapping::Runtime::Filter.build_node(
-        circuit: my_circuit,
-        id: :add_index,
-        **my_wrap_options
-      )
-      require "trailblazer/developer"
+    filter = my_custom_filter.build_node(
+      provider_node: provider_node,
+      id: :add_index,
+      **my_wrap_options
+    )
+
+    require "trailblazer/developer"
 Trailblazer::Developer.puts filter.task
 
-    assert_run filter, node: true, seq: [], index: 1, aggregate: {}, terminus: {index: 1}
+    assert_run node: filter, seq: [], index: 1, aggregate: {}, terminus: {index: 1}
   end
 end

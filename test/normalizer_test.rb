@@ -22,11 +22,11 @@ class NormalizerTest < Minitest::Spec
     in_node, out_node = lib_ctx[:node_for_input], lib_ctx[:node_for_output]
 
     # test in
-    lib_ctx, _ = assert_run in_node, node: true, seq: nil, target_ctx: {params: 1, current_user: Module, bogus: true}
+    lib_ctx, _ = assert_run node: in_node, seq: nil, target_ctx: {params: 1, current_user: Module, bogus: true}
     assert_equal lib_ctx[:target_ctx].to_h, {:current_user=>Module, :params=>1} # functional test, don't test Context internals here.
 
     # test out
-    lib_ctx, _ = assert_run out_node, node: true, seq: nil, target_ctx: lib_ctx[:target_ctx].merge(pollute: true, model: Class)
+    lib_ctx, _ = assert_run node: out_node, seq: nil, target_ctx: lib_ctx[:target_ctx].merge(pollute: true, model: Class)
     assert_equal lib_ctx[:target_ctx].to_h, {:current_user=>Module, :params=>1, model: Class, bogus: true} # functional test, don't test Context internals here.
   end
 
@@ -73,7 +73,7 @@ class NormalizerTest < Minitest::Spec
     in_node, out_node = lib_ctx[:node_for_input], lib_ctx[:node_for_output]
 
     # test in
-    lib_ctx, _ = assert_run in_node, node: true, seq: nil, target_ctx: {params: 1, current_user: Module, bogus: true},
+    lib_ctx, _ = assert_run node: in_node, seq: nil, target_ctx: {params: 1, current_user: Module, bogus: true},
       aggregate: {}, index: 0
     assert_equal lib_ctx[:target_ctx].to_h, {current_user: Module, my_index: 0} # functional test, don't test Context internals here.
 
